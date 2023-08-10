@@ -1,12 +1,12 @@
 #include <AccelStepper.h>
 
 
-AccelStepper motorLeft;
-AccelStepper motorRight(AccelStepper::FULL4WIRE, 6, 7, 8, 9);
+AccelStepper motorLeft(AccelStepper::FULL4WIRE, 2, 4, 3, 5);
+AccelStepper motorRight(AccelStepper::FULL4WIRE, 6, 8, 7, 9);
 
 #define moustacheGauche 10
 #define moustacheDroite 11
-
+int tournant 500;
 boolean manoeuvre = false;
 
 void setup() {
@@ -15,11 +15,11 @@ void setup() {
 
   motorLeft.setMaxSpeed(200.0);
   motorLeft.setAcceleration(100.0);
-  motorLeft.moveTo(24);
+  motorLeft.moveTo(500);
 
   motorRight.setMaxSpeed(200.0);
   motorRight.setAcceleration(100.0);
-  motorRight.moveTo(24);
+  motorRight.moveTo(500);
 }
 
 void loop() {
@@ -37,8 +37,8 @@ void loop() {
     if (!manoeuvre) {
       motorLeft.stop();
       motorRight.stop();
-      motorLeft.move(50);
-      motorRight.move(-50);
+      motorLeft.move(tournant);
+      motorRight.move(tournant * -1);
       manoeuvre = true;
     }
 
@@ -48,8 +48,8 @@ void loop() {
     if (!manoeuvre) {
       motorLeft.stop();
       motorRight.stop();
-      motorLeft.move(-50);
-      motorRight.move(50);
+      motorLeft.move(tournant * -1);
+      motorRight.move(tournant);
       manoeuvre = true;
     }
   } else {
@@ -57,8 +57,8 @@ void loop() {
     if (!manoeuvre) {
       motorLeft.stop();
       motorRight.stop();
-      motorLeft.move(-50);
-      motorRight.move(-50);
+      motorLeft.move(tournant * -1);
+      motorRight.move(tournant * -1);
       manoeuvre = true;
     }
   }
