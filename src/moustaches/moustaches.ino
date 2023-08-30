@@ -1,44 +1,41 @@
-#include <AccelStepper.h>
+// For two motors instance at once
+#include <L298NX2.h>
 
+#define EN_A 7
+#define IN1_A 8
+#define IN2_A 9
+#define EN_B 10
+#define IN1_B 11
+#define IN2_B 12
 
-AccelStepper motorLeft(AccelStepper::FULL4WIRE, 2, 4, 3, 5);
-AccelStepper motorRight(AccelStepper::FULL4WIRE, 6, 8, 7, 9);
+L298NX2 myMotors(EN_A, IN1_A, IN2_A, EN_B, IN1_B, IN2_B);
 
 #define moustacheGauche 10
 #define moustacheDroite 11
-int tournant 500;
+
+int tournant = 500;
 boolean manoeuvre = false;
 
 void setup() {
   pinMode(moustacheGauche, INPUT_PULLUP);
   pinMode(moustacheDroite, INPUT_PULLUP);
 
-  motorLeft.setMaxSpeed(200.0);
-  motorLeft.setAcceleration(100.0);
-  motorLeft.moveTo(500);
-
-  motorRight.setMaxSpeed(200.0);
-  motorRight.setAcceleration(100.0);
-  motorRight.moveTo(500);
+  myMotors.setSpeed(100);
 }
 
 void loop() {
 
-  if (!motorLeft.isRunning()) {
-    motorLeft.move(2400);
-    motorRight.move(2400);
-    manoeuvre = false;
-  }
-
+  myMotors.forward();
 
   if (digitalRead(moustacheGauche) == HIGH && digitalRead(moustacheDroite) == HIGH) {
     //motor run
   } else if (digitalRead(moustacheGauche) == HIGH && digitalRead(moustacheDroite) == LOW) {
     if (!manoeuvre) {
-      motorLeft.stop();
-      motorRight.stop();
-      motorLeft.move(tournant);
-      motorRight.move(tournant * -1);
+      myMotors.backwardFor(2000);
+      myMotors.backwardForA(1000);
+      myMotors.forwardForB(1000);
+
+
       manoeuvre = true;
     }
 
@@ -46,23 +43,19 @@ void loop() {
   } else if (digitalRead(moustacheGauche) == LOW && digitalRead(moustacheDroite) == HIGH) {
     //back and turn right
     if (!manoeuvre) {
-      motorLeft.stop();
-      motorRight.stop();
-      motorLeft.move(tournant * -1);
-      motorRight.move(tournant);
+      myMotors.backwardFor(2000);
+      myMotors.backwardForB(1000);
+      myMotors.forwardForA(1000);
+
+
       manoeuvre = true;
     }
   } else {
     //back
     if (!manoeuvre) {
-      motorLeft.stop();
-      motorRight.stop();
-      motorLeft.move(tournant * -1);
-      motorRight.move(tournant * -1);
+      myMotors.backwardFor(2000);
+
       manoeuvre = true;
     }
   }
-
-  motorLeft.run();
-  motorRight.run();
 }
