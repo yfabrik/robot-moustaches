@@ -14,7 +14,8 @@ L298NX2 myMotors(EN_A, IN1_A, IN2_A, EN_B, IN1_B, IN2_B);
 #define moustacheGauche 3
 #define moustacheDroite 4
 
-
+unsigned long quart_tour_ms = 1000;
+unsigned long recul_ms = 1000;
 
 void setup() {
   pinMode(moustacheGauche, INPUT_PULLUP);
@@ -33,28 +34,37 @@ void loop() {
     myMotors.stop();
     delay(1000);
     myMotors.backward();
-    delay(1000);
+    delay(recul_ms);
     myMotors.stop();
     delay(1000);
     myMotors.backwardA();
     myMotors.forwardB();
-    delay(500);
+    delay(quart_tour_ms);
+
   } else if (digitalRead(moustacheGauche) == LOW && digitalRead(moustacheDroite) == HIGH) {
     //back and turn right
     myMotors.stop();
     delay(1000);
     myMotors.backward();
-    delay(1000);
+    delay(recul_ms);
     myMotors.stop();
     delay(1000);
     myMotors.backwardB();
     myMotors.forwardA();
-    delay(500);
+    delay(quart_tour_ms);
     // }
   } else {
     //back
-    myMotors.backwardFor(2000);
-
+    // myMotors.backwardFor(2000);
+    myMotors.stop();
+    delay(1000);
+    myMotors.backward();
+    delay(recul_ms);
+    myMotors.stop();
+    delay(1000);
+    myMotors.backwardB();
+    myMotors.forwardA();
+    delay(quart_tour_ms * 2);
     // }
   }
 }
