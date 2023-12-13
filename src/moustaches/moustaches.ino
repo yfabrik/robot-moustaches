@@ -1,68 +1,70 @@
-#include <AccelStepper.h>
+// For two motors instance at once
+#include <L298NX2.h>
 
+#define EN_A 9
+#define IN1_A 8
+#define IN2_A 7
 
-AccelStepper motorLeft(AccelStepper::FULL4WIRE, 2, 4, 3, 5);
-AccelStepper motorRight(AccelStepper::FULL4WIRE, 6, 8, 7, 9);
+#define EN_B 10
+#define IN1_B 5
+#define IN2_B 6
 
-#define moustacheGauche 10
-#define moustacheDroite 11
-int tournant 500;
-boolean manoeuvre = false;
+L298NX2 myMotors(EN_A, IN1_A, IN2_A, EN_B, IN1_B, IN2_B);
+
+#define moustacheGauche 3
+#define moustacheDroite 4
+
+unsigned long quart_tour_ms = 1000;
+unsigned long recul_ms = 1000;
 
 void setup() {
   pinMode(moustacheGauche, INPUT_PULLUP);
   pinMode(moustacheDroite, INPUT_PULLUP);
 
-  motorLeft.setMaxSpeed(200.0);
-  motorLeft.setAcceleration(100.0);
-  motorLeft.moveTo(500);
-
-  motorRight.setMaxSpeed(200.0);
-  motorRight.setAcceleration(100.0);
-  motorRight.moveTo(500);
+  //motor speed si alim en 6v -> 255 = 6V ; 127 = 3v
+  myMotors.setSpeed(250);
 }
 
 void loop() {
-
-  if (!motorLeft.isRunning()) {
-    motorLeft.move(2400);
-    motorRight.move(2400);
-    manoeuvre = false;
-  }
-
-
   if (digitalRead(moustacheGauche) == HIGH && digitalRead(moustacheDroite) == HIGH) {
-    //motor run
-  } else if (digitalRead(moustacheGauche) == HIGH && digitalRead(moustacheDroite) == LOW) {
-    if (!manoeuvre) {
-      motorLeft.stop();
-      motorRight.stop();
-      motorLeft.move(tournant);
-      motorRight.move(tournant * -1);
-      manoeuvre = true;
-    }
+    myMotors.forward();
 
+  } else if (digitalRead(moustacheGauche) == HIGH && digitalRead(moustacheDroite) == LOW) {
     // back and turn left
+    myMotors.stop();
+    delay(1000);
+    myMotors.backward();
+    delay(recul_ms);
+    myMotors.stop();
+    delay(1000);
+    myMotors.backwardA();
+    myMotors.forwardB();
+    delay(quart_tour_ms);
+
   } else if (digitalRead(moustacheGauche) == LOW && digitalRead(moustacheDroite) == HIGH) {
     //back and turn right
-    if (!manoeuvre) {
-      motorLeft.stop();
-      motorRight.stop();
-      motorLeft.move(tournant * -1);
-      motorRight.move(tournant);
-      manoeuvre = true;
-    }
+    myMotors.stop();
+    delay(1000);
+    myMotors.backward();
+    delay(recul_ms);
+    myMotors.stop();
+    delay(1000);
+    myMotors.backwardB();
+    myMotors.forwardA();
+    delay(quart_tour_ms);
+    // }
   } else {
     //back
-    if (!manoeuvre) {
-      motorLeft.stop();
-      motorRight.stop();
-      motorLeft.move(tournant * -1);
-      motorRight.move(tournant * -1);
-      manoeuvre = true;
-    }
+    // myMotors.backwardFor(2000);
+    myMotors.stop();
+    delay(1000);
+    myMotors.backward();
+    delay(recul_ms);
+    myMotors.stop();
+    delay(1000);
+    myMotors.backwardB();
+    myMotors.forwardA();
+    delay(quart_tour_ms * 2);
+    // }
   }
-
-  motorLeft.run();
-  motorRight.run();
 }
